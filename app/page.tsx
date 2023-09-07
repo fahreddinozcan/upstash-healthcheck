@@ -29,8 +29,8 @@ export default function Home() {
   const [pingData, setPingData] = useState<PingObject[]>([]);
 
   useEffect(() => {
-    const intervalId = setInterval(getPingData, 2000);
-    // const intervalId = setInterval(() => {}, 5000);
+    // const intervalId = setInterval(getPingData, 2000);
+    const intervalId = setInterval(() => {}, 5000);
 
     return () => clearInterval(intervalId);
   });
@@ -54,6 +54,7 @@ export default function Home() {
       <button
         onClick={async () => {
           const res = await fetch("/api/ping");
+          console.log(await res.json());
         }}
         className="mt-24"
       >
