@@ -8,30 +8,21 @@ const redis = new Redis({
     "AYdkASQgMjg0NTE4OGUtODZkYi00NTE2LWIyNTUtMjE4NDVlNmJmZjY3NWE5YWYxYmEyOTA0NDIxMTk3Y2FjNmQwZTA3ZmUzZjg=",
 });
 
-export async function GET(_req: NextRequest) {
+export async function GET(req: NextRequest) {
   const url = "google.com";
   const currentDate = new Date();
-  const time =
-    currentDate.getHours() +
-    ":" +
-    currentDate.getMinutes() +
-    ":" +
-    currentDate.getSeconds();
+  const time = currentDate.getHours() + ":" + currentDate.getMinutes();
 
   const currentTime = Date.now();
   await axios.get(`https://${url}`);
   const pingTime = Date.now() - currentTime;
+
   const pingData = {
     time: time,
     ping: pingTime,
   };
 
-  const res = await redis.json.arrappend(
-    `ping_data:${url}`,
-    "$",
-    JSON.stringify(pingData)
-  );
-  console.log(res);
+  await redis.json.arrappend(`ping_data:${url}`, "$", JSON.stringify(pingData));
 
   return NextResponse.json({ ping: pingTime, time: time });
 }

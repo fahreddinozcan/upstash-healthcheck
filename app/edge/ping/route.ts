@@ -15,12 +15,7 @@ export const POST = verifySignatureEdge(handler);
 async function handler(_request: NextRequest) {
   const url = "google.com";
   const currentDate = new Date();
-  const time =
-    currentDate.getHours() +
-    ":" +
-    currentDate.getMinutes() +
-    ":" +
-    currentDate.getSeconds();
+  const time = currentDate.getHours() + ":" + currentDate.getMinutes();
 
   const currentTime = Date.now();
   await axios.get(`https://${url}`);
