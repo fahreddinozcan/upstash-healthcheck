@@ -8,6 +8,8 @@ const redis = new Redis({
     "AYdkASQgMjg0NTE4OGUtODZkYi00NTE2LWIyNTUtMjE4NDVlNmJmZjY3NWE5YWYxYmEyOTA0NDIxMTk3Y2FjNmQwZTA3ZmUzZjg=",
 });
 
+export const runtime = "edge";
+
 export async function GET(req: NextRequest) {
   console.log("GET REQUEST");
   const url = "google.com";
