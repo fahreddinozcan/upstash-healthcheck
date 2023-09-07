@@ -11,7 +11,7 @@ const redis = new Redis({
 
 export const POST = verifySignatureEdge(handler);
 
-export async function handler(_request: NextRequest) {
+async function handler(_request: NextRequest) {
   const url = "google.com";
   const currentDate = new Date();
   const time =
