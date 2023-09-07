@@ -1,5 +1,3 @@
-"use client";
-
 import { NextResponse, NextRequest } from "next/server";
 import { Redis } from "@upstash/redis";
 import axios from "axios";
@@ -9,8 +7,6 @@ const redis = new Redis({
   token:
     "AYdkASQgMjg0NTE4OGUtODZkYi00NTE2LWIyNTUtMjE4NDVlNmJmZjY3NWE5YWYxYmEyOTA0NDIxMTk3Y2FjNmQwZTA3ZmUzZjg=",
 });
-
-export const runtime = "edge";
 
 export async function POST(req: NextRequest) {
   console.log("GET REQUEST");
