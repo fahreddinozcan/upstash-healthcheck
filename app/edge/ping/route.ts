@@ -21,19 +21,19 @@ async function handler(_request: NextRequest) {
     ":" +
     currentDate.getSeconds();
 
-  const resPing = await ping("google.com");
+  // const resPing = await ping("google.com");
 
-  const pingData = {
-    time: time,
-    ping: resPing.time,
-  };
+  // const pingData = {
+  //   time: time,
+  //   ping: resPing.time,
+  // };
 
-  const res = await redis.json.arrappend(
-    `ping_data:${url}`,
-    "$",
-    JSON.stringify(pingData)
-  );
-  console.log(res);
+  // const res = await redis.json.arrappend(
+  //   `ping_data:${url}`,
+  //   "$",
+  //   JSON.stringify(pingData)
+  // );
+  // console.log(res);
 
   return NextResponse.json({ message: "pong" });
 }
