@@ -3,7 +3,6 @@ import { NextResponse, NextRequest } from "next/server";
 import { Redis } from "@upstash/redis";
 import { verifySignatureEdge } from "@upstash/qstash/dist/nextjs";
 
-export const runtime = "edge";
 const redis = new Redis({
   url: "https://united-lamprey-34660.upstash.io",
   token:
