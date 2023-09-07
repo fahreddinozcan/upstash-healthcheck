@@ -1,31 +1,27 @@
 import ping from "pingman";
-import { NextResponse, NextRequest } from "next/server";
+import { NextApiResponse, NextApiRequest } from "next";
 import { Redis } from "@upstash/redis";
-import { Receiver } from "@upstash/qstash";
+import { verifySignature } from "@upstash/qstash/nextjs";
 
-export const runtime = "edge";
 const redis = new Redis({
   url: "https://united-lamprey-34660.upstash.io",
   token:
     "AYdkASQgMjg0NTE4OGUtODZkYi00NTE2LWIyNTUtMjE4NDVlNmJmZjY3NWE5YWYxYmEyOTA0NDIxMTk3Y2FjNmQwZTA3ZmUzZjg=",
 });
 
-const receiver = new Receiver({
-  currentSigningKey: "sig_69BSYbQhkboLVqEpaX4LkGduzbPN",
-  nextSigningKey: "sig_7czUw2TTv1VCSegkPtraCd5x2cTX",
-});
+// const receiver = new Receiver({
+//   currentSigningKey: "sig_69BSYbQhkboLVqEpaX4LkGduzbPN",
+//   nextSigningKey: "sig_7czUw2TTv1VCSegkPtraCd5x2cTX",
+// });
 
-export async function GET(request: NextRequest) {
-  const isValid = await receiver.verify({
-    signature: "string",
-    body: "string",
-  });
-  if (!isValid) {
-    console.log("not valid");
-    return new NextResponse("Unauthorized", { status: 401 });
-  }
+export default verifySignature(handler);
 
-  console.log("valid");
+export async function handler(
+  request: NextApiRequest,
+  response: NextApiResponse
+) {
+  if (request.method !== "POST")
+    return response.status(405).json({ message: "Method not allowed" });
 
   const url = "google.com";
   const currentDate = new Date();
@@ -36,11 +32,11 @@ export async function GET(request: NextRequest) {
     ":" +
     currentDate.getSeconds();
 
-  const response = await ping("google.com");
+  const resPing = await ping("google.com");
 
   const pingData = {
     time: time,
-    ping: response.time,
+    ping: resPing.time,
   };
 
   const res = await redis.json.arrappend(
@@ -49,5 +45,12 @@ export async function GET(request: NextRequest) {
     JSON.stringify(pingData)
   );
   console.log(res);
-  return NextResponse.json({ ping: response.time });
+
+  return response.status(200).json({ message: "pong" });
 }
+
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
