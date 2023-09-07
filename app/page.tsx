@@ -119,7 +119,7 @@ export default function Home() {
             <Button
               variant={"default"}
               onClick={async () => {
-                const data = await fetch("/api/ping");
+                const data = await fetch("/api/ping", { method: "POST" });
                 console.log(data);
               }}
               className="whitespace-nowrap"

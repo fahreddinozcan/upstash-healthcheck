@@ -10,7 +10,7 @@ const redis = new Redis({
 
 export const runtime = "edge";
 
-export async function GET(req: NextRequest) {
+export async function POST(req: NextRequest) {
   console.log("GET REQUEST");
   const url = "google.com";
   const currentDate = new Date();
