@@ -3,6 +3,7 @@ import { NextApiResponse, NextApiRequest } from "next";
 import { Redis } from "@upstash/redis";
 import { verifySignature } from "@upstash/qstash/nextjs";
 
+export const runtime = "edge";
 const redis = new Redis({
   url: "https://united-lamprey-34660.upstash.io",
   token:
@@ -48,9 +49,3 @@ export async function handler(
 
   return response.status(200).json({ message: "pong" });
 }
-
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
