@@ -9,6 +9,7 @@ const redis = new Redis({
 });
 
 export async function GET(req: NextRequest) {
+  console.log("GET REQUEST");
   const url = "google.com";
   const currentDate = new Date();
   const time = currentDate.getHours() + ":" + currentDate.getMinutes();
