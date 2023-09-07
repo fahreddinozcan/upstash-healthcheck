@@ -3,6 +3,7 @@ import { NextResponse, NextRequest } from "next/server";
 import { Redis } from "@upstash/redis";
 import { Receiver } from "@upstash/qstash";
 
+export const runtime = "edge";
 const redis = new Redis({
   url: "https://united-lamprey-34660.upstash.io",
   token:
