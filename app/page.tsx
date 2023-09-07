@@ -29,8 +29,8 @@ export default function Home() {
   const [pingData, setPingData] = useState<PingObject[]>([]);
 
   useEffect(() => {
-    // const intervalId = setInterval(getPingData, 2000);
-    const intervalId = setInterval(() => {}, 5000);
+    const intervalId = setInterval(getPingData, 4000);
+    // const intervalId = setInterval(() => {}, 5000);
 
     return () => clearInterval(intervalId);
   });
