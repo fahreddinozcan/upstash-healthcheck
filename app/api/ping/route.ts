@@ -1,3 +1,5 @@
+"use client";
+
 import { NextResponse, NextRequest } from "next/server";
 import { Redis } from "@upstash/redis";
 import axios from "axios";
