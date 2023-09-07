@@ -1,7 +1,7 @@
 import ping from "pingman";
-import { NextApiResponse, NextApiRequest } from "next";
+import { NextResponse, NextRequest } from "next/server";
 import { Redis } from "@upstash/redis";
-import { verifySignature } from "@upstash/qstash/nextjs";
+import { verifySignatureEdge } from "@upstash/qstash/dist/nextjs";
 
 export const runtime = "edge";
 const redis = new Redis({
@@ -10,20 +10,9 @@ const redis = new Redis({
     "AYdkASQgMjg0NTE4OGUtODZkYi00NTE2LWIyNTUtMjE4NDVlNmJmZjY3NWE5YWYxYmEyOTA0NDIxMTk3Y2FjNmQwZTA3ZmUzZjg=",
 });
 
-// const receiver = new Receiver({
-//   currentSigningKey: "sig_69BSYbQhkboLVqEpaX4LkGduzbPN",
-//   nextSigningKey: "sig_7czUw2TTv1VCSegkPtraCd5x2cTX",
-// });
+export const POST = verifySignatureEdge(handler);
 
-export default verifySignature(handler);
-
-export async function handler(
-  request: NextApiRequest,
-  response: NextApiResponse
-) {
-  if (request.method !== "POST")
-    return response.status(405).json({ message: "Method not allowed" });
-
+export async function handler(_request: NextRequest) {
   const url = "google.com";
   const currentDate = new Date();
   const time =
@@ -47,5 +36,5 @@ export async function handler(
   );
   console.log(res);
 
-  return response.status(200).json({ message: "pong" });
+  return NextResponse.json({ message: "pong" });
 }
