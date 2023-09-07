@@ -1,7 +1,5 @@
-import ping from "pingman";
 import { NextResponse, NextRequest } from "next/server";
 import { Redis } from "@upstash/redis";
-import { verifySignatureEdge } from "@upstash/qstash/dist/nextjs";
 import axios from "axios";
 
 const redis = new Redis({
@@ -10,9 +8,7 @@ const redis = new Redis({
     "AYdkASQgMjg0NTE4OGUtODZkYi00NTE2LWIyNTUtMjE4NDVlNmJmZjY3NWE5YWYxYmEyOTA0NDIxMTk3Y2FjNmQwZTA3ZmUzZjg=",
 });
 
-export const POST = verifySignatureEdge(handler);
-
-async function handler(_request: NextRequest) {
+export async function GET(_req: NextRequest) {
   const url = "google.com";
   const currentDate = new Date();
   const time =
@@ -25,7 +21,6 @@ async function handler(_request: NextRequest) {
   const currentTime = Date.now();
   await axios.get(`https://${url}`);
   const pingTime = Date.now() - currentTime;
-
   const pingData = {
     time: time,
     ping: pingTime,
