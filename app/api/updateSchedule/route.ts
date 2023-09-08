@@ -54,7 +54,7 @@ const createSchedule = async (schedule: CreateScheduleRequest) => {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
-        "Upstash-Cron": "* * * * *",
+        "Upstash-Cron": schedule.cron,
       },
       body: JSON.stringify({ url: schedule.destination }),
     }
