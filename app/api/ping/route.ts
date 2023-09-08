@@ -13,7 +13,9 @@ export async function POST(req: NextRequest) {
   console.log(data);
   const currentDate = new Date();
   const time =
-    currentDate.getHours() + ":" + currentDate.getMinutes().toFixed(2);
+    currentDate.getHours().toString().padStart(2, "0") +
+    ":" +
+    currentDate.getMinutes().toString().padStart(2, "0");
 
   const currentTime = Date.now();
   await axios.get(`${data.url}`);
