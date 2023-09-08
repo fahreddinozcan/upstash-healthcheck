@@ -12,13 +12,14 @@ const redis = new Redis({
 
 export const POST = verifySignatureEdge(handler);
 
-async function handler(_request: NextRequest) {
-  const url = "google.com";
+async function handler(request: NextRequest) {
+  const { url } = await request.json();
+
   const currentDate = new Date();
   const time = currentDate.getHours() + ":" + currentDate.getMinutes();
 
   const currentTime = Date.now();
-  await axios.get(`https://${url}`);
+  await axios.get(`${url}`);
   const pingTime = Date.now() - currentTime;
 
   const pingData = {

@@ -9,13 +9,13 @@ const redis = new Redis({
 });
 
 export async function POST(req: NextRequest) {
-  console.log("GET REQUEST");
-  const url = "google.com";
+  const data = await req.json();
+  console.log(data);
   const currentDate = new Date();
   const time = currentDate.getHours() + ":" + currentDate.getMinutes();
 
   const currentTime = Date.now();
-  await axios.get(`https://${url}`);
+  await axios.get(`${data.url}`);
   const pingTime = Date.now() - currentTime;
 
   const pingData = {
@@ -23,7 +23,11 @@ export async function POST(req: NextRequest) {
     ping: pingTime,
   };
 
-  await redis.json.arrappend(`ping_data:${url}`, "$", JSON.stringify(pingData));
+  await redis.json.arrappend(
+    `ping_data:${data.url}`,
+    "$",
+    JSON.stringify(pingData)
+  );
 
   return NextResponse.json({ ping: pingTime, time: time });
 }

@@ -18,7 +18,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-
 import {
   Dialog,
   DialogContent,
@@ -36,12 +35,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+} from "@/components/ui/form";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { Redis } from "@upstash/redis";
 import { SelectGroup } from "@radix-ui/react-select";
+import { useForm } from "react-hook-form";
+import * as zod from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import type { CreateScheduleRequest } from "@upstash/qstash";
 
 const redis = new Redis({
   url: "https://united-lamprey-34660.upstash.io",
@@ -55,7 +66,7 @@ type PingObject = {
 };
 export default function Home() {
   const [url, setUrl] = useState("google.com");
-
+  const [schedule, setSchedule] = useState("* * * * *");
   const [pingData, setPingData] = useState<PingObject[]>([]);
 
   useEffect(() => {
@@ -66,6 +77,7 @@ export default function Home() {
   });
 
   const getPingData = async () => {
+    console.log("HERE");
     const len = (await redis.json.arrlen(`ping_data:${url}`))[0];
     if (!len) {
       setPingData([]);
@@ -85,8 +97,38 @@ export default function Home() {
 
   const resetPingData = async () => {
     const res = await redis.json.clear(`ping_data:${url}`, "$");
+    setPingData([]);
     return res;
   };
+
+  const handleSubmit = async (scheduleRequest: CreateScheduleRequest) => {
+    const res = await fetch("/api/updateSchedule", {
+      method: "POST",
+      body: JSON.stringify(scheduleRequest),
+    });
+    await redis.json.set(`ping_data:${scheduleRequest.destination}`, "$", []);
+    console.log(await res.json());
+  };
+  const formSchema = zod.object({
+    url: zod
+      .string({ required_error: "Please input an URL." })
+      .url({ message: "Please input a valid URL." }),
+    schedule: zod.string(),
+  });
+
+  const form = useForm<zod.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+  });
+
+  function onSubmit(data: zod.infer<typeof formSchema>) {
+    console.log(data);
+    handleSubmit({
+      destination: data.url,
+      cron: data.schedule,
+    });
+    setUrl(data.url);
+    resetPingData();
+  }
   return (
     <div className="w-full flex-col flex items-center justify-center gap-10 mt-20">
       <Card className="w-min p-4 mt-5">
@@ -119,8 +161,12 @@ export default function Home() {
             <Button
               variant={"default"}
               onClick={async () => {
-                const data = await fetch("/api/ping", { method: "POST" });
-                console.log(data);
+                console.log({ url });
+                const data = await fetch("/api/ping", {
+                  method: "POST",
+                  body: JSON.stringify({ url }),
+                });
+                // console.log(data);
               }}
               className="whitespace-nowrap"
             >
@@ -138,43 +184,78 @@ export default function Home() {
                     done.
                   </DialogDescription>
                 </DialogHeader>
-                <div className="grid gap-4 py-4">
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="url" className="text-right">
-                      URL
-                    </Label>
-                    <Input id="name" value={url} className="col-span-3" />
-                  </div>
-                  <div className="grid grid-cols-4 items-center justify-start gap-4 w-full">
-                    <Label htmlFor="username" className="text-right">
-                      Schedule
-                    </Label>
-
-                    <Select>
-                      <SelectTrigger className="col-span-3">
-                        <SelectValue placeholder="Every * * * * *" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectGroup>
-                          <SelectItem value="1-minute">every minute</SelectItem>
-                          <SelectItem value="5-minute">
-                            every 5 minutes
-                          </SelectItem>
-                          <SelectItem value="10-minute">
-                            every 10 minutes
-                          </SelectItem>
-                          <SelectItem value="30-minute">
-                            every 30 minutes
-                          </SelectItem>
-                          <SelectItem value="60-minute">every hour</SelectItem>
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <DialogFooter>
-                  <Button type="submit">Save changes</Button>
-                </DialogFooter>
+                <Form {...form}>
+                  <form
+                    className="grid gap-4 py-4"
+                    onSubmit={form.handleSubmit(onSubmit)}
+                  >
+                    <FormField
+                      name="url"
+                      control={form.control}
+                      defaultValue={url}
+                      render={({ field }) => {
+                        return (
+                          <FormItem className="grid grid-cols-4 items-center gap-4">
+                            <FormLabel htmlFor="url" className="text-right">
+                              URL
+                            </FormLabel>
+                            <Input
+                              id="name"
+                              className="col-span-3"
+                              {...field}
+                            />
+                            <FormMessage className="whitespace-nowrap" />
+                          </FormItem>
+                        );
+                      }}
+                    />
+                    <FormField
+                      name="schedule"
+                      control={form.control}
+                      defaultValue={schedule}
+                      render={({ field }) => {
+                        return (
+                          <FormItem className="grid grid-cols-4 items-center gap-4 w-full">
+                            <FormLabel className="text-right">
+                              Schedule
+                            </FormLabel>
+                            <Select
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                            >
+                              <SelectTrigger className="col-span-3">
+                                <SelectValue placeholder="Every * * * * *" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectGroup>
+                                  <SelectItem value="* * * * *">
+                                    every minute
+                                  </SelectItem>
+                                  <SelectItem value="*/5 * * * *">
+                                    every 5 minutes
+                                  </SelectItem>
+                                  <SelectItem value="*/10 * * * *">
+                                    every 10 minutes
+                                  </SelectItem>
+                                  <SelectItem value="*/30 * * * *">
+                                    every 30 minutes
+                                  </SelectItem>
+                                  <SelectItem value="0 * * * *">
+                                    every hour
+                                  </SelectItem>
+                                </SelectGroup>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        );
+                      }}
+                    />
+                    <DialogFooter>
+                      <Button type="submit">Save</Button>
+                    </DialogFooter>
+                  </form>
+                </Form>
               </DialogContent>
             </Dialog>
             <Button
