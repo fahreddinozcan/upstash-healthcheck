@@ -117,6 +117,7 @@ export default function Home() {
       body: JSON.stringify(scheduleRequest),
     });
     await redis.json.set(`ping_data:${scheduleRequest.destination}`, "$", []);
+    await redis.set("current_ping_url", scheduleRequest.destination);
     console.log(await res.json());
   };
   const formSchema = zod.object({
