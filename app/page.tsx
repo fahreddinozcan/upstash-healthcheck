@@ -261,7 +261,9 @@ export default function Home() {
                       }}
                     />
                     <DialogFooter>
-                      <Button type="submit">Save</Button>
+                      <DialogTrigger asChild>
+                        <Button type="submit">Save</Button>
+                      </DialogTrigger>
                     </DialogFooter>
                   </form>
                 </Form>
