@@ -47,6 +47,7 @@ const getSchedule = async (scheduleId: string) => {
 };
 
 const createSchedule = async (schedule: CreateScheduleRequest) => {
+  console.log({ url: schedule.destination });
   const res = await fetch(
     `https://qstash.upstash.io/v2/schedules/https://healthcheck.upstash.app/edge/ping`,
     {

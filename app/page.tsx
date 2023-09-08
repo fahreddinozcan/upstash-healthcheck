@@ -65,16 +65,26 @@ type PingObject = {
   ping: number;
 };
 export default function Home() {
-  const [url, setUrl] = useState("google.com");
+  const [url, setUrl] = useState("********");
   const [schedule, setSchedule] = useState("* * * * *");
   const [pingData, setPingData] = useState<PingObject[]>([]);
 
   useEffect(() => {
-    const intervalId = setInterval(getPingData, 4000);
-    // const intervalId = setInterval(() => {}, 5000);
+    // const intervalId = setInterval(getPingData, 4000);
+    const intervalId = setInterval(() => {}, 5000);
 
     return () => clearInterval(intervalId);
   });
+
+  useEffect(() => {
+    (async () => {
+      const url = (await redis.get("current_ping_url")) as string;
+
+      if (url) {
+        setUrl(url);
+      }
+    })();
+  }, []);
 
   const getPingData = async () => {
     console.log("HERE");
@@ -126,6 +136,7 @@ export default function Home() {
       destination: data.url,
       cron: data.schedule,
     });
+    redis.set("current_ping_url", data.url);
     setUrl(data.url);
     resetPingData();
   }
@@ -134,10 +145,7 @@ export default function Home() {
       <Card className="w-min p-4 mt-5">
         <CardHeader>
           <CardTitle>Health Check</CardTitle>
-          <CardDescription>
-            Currently making healthcheck for{" "}
-            <span className="font-bold">{url}</span>
-          </CardDescription>
+          <Description url={url} />
         </CardHeader>
         <CardContent>
           <div className="mt-4">
@@ -271,5 +279,13 @@ export default function Home() {
         </CardFooter>
       </Card>
     </div>
+  );
+}
+
+function Description({ url }: { url: string }) {
+  return (
+    <CardDescription>
+      Currently making healthcheck for <span className="font-bold">{url}</span>
+    </CardDescription>
   );
 }
