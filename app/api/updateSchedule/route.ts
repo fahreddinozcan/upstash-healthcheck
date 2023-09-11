@@ -50,7 +50,7 @@ const createSchedule = async (
   schedule: CreateScheduleRequest,
   sessionToken: string
 ) => {
-  console.log({ url: schedule.destination });
+  // console.log({ url: schedule.destination });
   const res = await fetch(
     `https://qstash.upstash.io/v2/schedules/https://healthcheck.upstash.app/edge/ping`,
     {
@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
   //get the body of the post request
   const body = await request.json();
   const { sessionToken, create } = body;
-  console.log(body);
+  // console.log(body);
 
   // if (!currentScheduleId) return NextResponse.json("NO");
 
@@ -84,15 +84,15 @@ export async function POST(request: NextRequest) {
       "scheduleId"
     )) as string;
     const lastSchedule = await getSchedule(currentScheduleId);
-    console.log(currentScheduleId);
-    console.log(lastSchedule);
+    // console.log(currentScheduleId);
+    // console.log(lastSchedule);
 
     await removeSchedule(lastSchedule.scheduleId);
   }
 
   // const removedSchedule = await removeSchedule(lastSchedule.scheduleId);
   const newSchedule = await createSchedule(body, sessionToken);
-  console.log(`NEW SCHEDULE: `, newSchedule);
+  // console.log(`NEW SCHEDULE: `, newSchedule);
   await redis.hset(`session_data:${sessionToken}`, {
     scheduleId: newSchedule.scheduleId,
     url: body.destination,
@@ -100,6 +100,6 @@ export async function POST(request: NextRequest) {
   });
 
   const finalSchedules = await listSchedules();
-  console.log(finalSchedules);
+  // console.log(finalSchedules);
   return NextResponse.json({ finalSchedules });
 }

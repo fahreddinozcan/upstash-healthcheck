@@ -33,6 +33,7 @@ import type { CreateScheduleRequest } from "@upstash/qstash";
 import { cookies } from "next/headers";
 import { Chart } from "./components/Chart";
 import { EditForm } from "./components/EditForm";
+import { Spinner } from "./components/Spinner";
 
 const redis = new Redis({
   url: "https://united-lamprey-34660.upstash.io",
@@ -71,9 +72,9 @@ export default function Home() {
       const { sessionToken } = data;
       setSessionToken(sessionToken);
 
-      console.log(data);
+      // console.log(data);
       const sessionData = await redis.hgetall(`session_data:${sessionToken}`);
-      console.log(sessionData);
+      // console.log(sessionData);
       // const {url} = sessionData;
       if (!sessionData) {
         setButtonsLoading(false);
@@ -85,15 +86,12 @@ export default function Home() {
       >;
 
       if (url) {
-        console.log("URL");
         setUrl(url);
       }
       if (schedule) {
-        console.log("schedule");
         setSchedule(schedule);
       }
       if (scheduleId) {
-        console.log("scheduleid");
         setScheduleId(scheduleId);
       }
       setButtonsLoading(false);
@@ -102,7 +100,7 @@ export default function Home() {
 
   const getPingData = async () => {
     if (!scheduleId) return;
-    console.log("HERE");
+    // console.log("HERE");
     const len = (
       await redis.json.arrlen(`ping_data:${sessionToken}:${url}`)
     )[0];
@@ -117,7 +115,7 @@ export default function Home() {
       `ping_data:${sessionToken}:${url}`,
       `$[${start}:]`
     )) as PingObject[];
-    console.log(data);
+    // console.log(data);
 
     setPingData(data);
   };
@@ -148,7 +146,7 @@ export default function Home() {
     await redis.hset(`session_data:${sessionToken}`, {
       url: scheduleRequest.destination,
     });
-    console.log(await res.json());
+    // console.log(await res.json());
   };
   const formSchema = zod.object({
     url: zod
@@ -162,7 +160,7 @@ export default function Home() {
   });
 
   function onSubmitEdit(data: zod.infer<typeof formSchema>) {
-    console.log(data);
+    // console.log(data);
     handleSubmit(
       {
         destination: data.url,
@@ -187,7 +185,7 @@ export default function Home() {
   }
 
   function onSubmitCreate(data: zod.infer<typeof formSchema>) {
-    console.log(data);
+    // console.log(data);
     handleSubmit(
       {
         destination: data.url,
@@ -202,7 +200,7 @@ export default function Home() {
 
     setTimeout(() => {
       window.location.reload();
-    }, 1000);
+    }, 3000);
   }
 
   return (
@@ -220,13 +218,14 @@ export default function Home() {
           <CardFooter className="flex justify-end">
             <div className="flex justify-between w-min gap-2">
               {buttonsLoading ? (
-                <div>Loading...</div>
+                <div className="w-full flex items-center justify-center">
+                  <Spinner />
+                </div>
               ) : sessionToken && scheduleId ? (
                 <>
                   <Button
                     variant={"default"}
                     onClick={async () => {
-                      console.log({ url });
                       const data = await fetch("/api/ping", {
                         method: "POST",
                         body: JSON.stringify({ url, sessionToken }),
@@ -263,7 +262,7 @@ export default function Home() {
                     variant={"destructive"}
                     onClick={() => {
                       const data = resetPingData();
-                      console.log(data);
+                      // console.log(data);
                     }}
                   >
                     Reset
@@ -304,10 +303,21 @@ export default function Home() {
 }
 
 function Description({ url, cron }: { url: string; cron: string }) {
+  const schedules: Record<string, string> = {
+    "* * * * *": "every minute",
+    "*/5 * * * *": "every 5 minutes",
+    "*/10 * * * *": "every 10 minutes",
+    "*/15 * * * *": "every 15 minutes",
+    "*/30 * * * *": "every 30 minutes",
+    "0 * * * *": "every hour",
+  };
   return (
     <CardDescription>
       Currently making healthcheck for <span className="font-bold">{url}</span>{" "}
-      with the cron schedule of <span className="font-bold">{cron}</span>
+      with the schedule of{" "}
+      <span className="font-bold">
+        {schedules[cron]} ({cron})
+      </span>
     </CardDescription>
   );
 }

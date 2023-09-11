@@ -10,7 +10,7 @@ const redis = new Redis({
 
 export async function POST(req: NextRequest) {
   const data = await req.json();
-  console.log(data);
+  // console.log(data);
   const { sessionToken } = data;
   const currentDate = new Date();
   const time =
