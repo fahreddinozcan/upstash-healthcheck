@@ -11,6 +11,7 @@ const redis = new Redis({
 export async function POST(req: NextRequest) {
   const data = await req.json();
   console.log(data);
+  const { sessionToken } = data;
   const currentDate = new Date();
   const time =
     currentDate.getHours().toString().padStart(2, "0") +
@@ -27,7 +28,7 @@ export async function POST(req: NextRequest) {
   };
 
   await redis.json.arrappend(
-    `ping_data:${data.url}`,
+    `ping_data:${sessionToken}:${data.url}`,
     "$",
     JSON.stringify(pingData)
   );

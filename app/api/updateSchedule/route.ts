@@ -46,7 +46,10 @@ const getSchedule = async (scheduleId: string) => {
   return schedule;
 };
 
-const createSchedule = async (schedule: CreateScheduleRequest) => {
+const createSchedule = async (
+  schedule: CreateScheduleRequest,
+  sessionToken: string
+) => {
   console.log({ url: schedule.destination });
   const res = await fetch(
     `https://qstash.upstash.io/v2/schedules/https://healthcheck.upstash.app/edge/ping`,
@@ -56,7 +59,10 @@ const createSchedule = async (schedule: CreateScheduleRequest) => {
         Authorization: `Bearer ${token}`,
         "Upstash-Cron": schedule.cron,
       },
-      body: JSON.stringify({ url: schedule.destination }),
+      body: JSON.stringify({
+        url: schedule.destination,
+        sessionToken: sessionToken,
+      }),
     }
   );
 
@@ -67,21 +73,31 @@ const createSchedule = async (schedule: CreateScheduleRequest) => {
 export async function POST(request: NextRequest) {
   //get the body of the post request
   const body = await request.json();
+  const { sessionToken, create } = body;
   console.log(body);
-  const currentScheduleId = (await redis.get("current_schedule_id")) as string;
 
-  if (!currentScheduleId) return NextResponse.json("NO");
+  // if (!currentScheduleId) return NextResponse.json("NO");
 
-  const lastSchedule = await getSchedule(currentScheduleId);
-  console.log(currentScheduleId);
-  console.log(lastSchedule);
+  if (!create) {
+    const currentScheduleId = (await redis.hget(
+      `session_data:${sessionToken}`,
+      "scheduleId"
+    )) as string;
+    const lastSchedule = await getSchedule(currentScheduleId);
+    console.log(currentScheduleId);
+    console.log(lastSchedule);
 
-  await removeSchedule(lastSchedule.scheduleId);
+    await removeSchedule(lastSchedule.scheduleId);
+  }
 
   // const removedSchedule = await removeSchedule(lastSchedule.scheduleId);
-  const newSchedule = await createSchedule(body);
+  const newSchedule = await createSchedule(body, sessionToken);
   console.log(`NEW SCHEDULE: `, newSchedule);
-  await redis.set("current_schedule_id", newSchedule.scheduleId);
+  await redis.hset(`session_data:${sessionToken}`, {
+    scheduleId: newSchedule.scheduleId,
+    url: body.destination,
+    schedule: body.cron,
+  });
 
   const finalSchedules = await listSchedules();
   console.log(finalSchedules);

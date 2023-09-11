@@ -13,7 +13,7 @@ const redis = new Redis({
 export const POST = verifySignatureEdge(handler);
 
 async function handler(request: NextRequest) {
-  const { url } = await request.json();
+  const { url, sessionToken } = await request.json();
 
   const currentDate = new Date();
   const time = currentDate.getHours() + ":" + currentDate.getMinutes();
@@ -28,7 +28,7 @@ async function handler(request: NextRequest) {
   };
 
   const res = await redis.json.arrappend(
-    `ping_data:${url}`,
+    `ping_data:${sessionToken}:${url}`,
     "$",
     JSON.stringify(pingData)
   );

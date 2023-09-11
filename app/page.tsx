@@ -1,15 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import {
-  Line,
-  LineChart,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  XAxis,
-  YAxis,
-} from "recharts";
+
 import {
   Card,
   CardContent,
@@ -27,34 +19,20 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectLabel,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Form,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormControl,
-  FormMessage,
-} from "@/components/ui/form";
+
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/components/ui/use-toast";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { Redis } from "@upstash/redis";
-import { SelectGroup } from "@radix-ui/react-select";
-import { useForm } from "react-hook-form";
 import * as zod from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+
 import type { CreateScheduleRequest } from "@upstash/qstash";
+import { cookies } from "next/headers";
+import { Chart } from "./components/Chart";
+import { EditForm } from "./components/EditForm";
 
 const redis = new Redis({
   url: "https://united-lamprey-34660.upstash.io",
@@ -67,9 +45,18 @@ type PingObject = {
   ping: number;
 };
 export default function Home() {
+  // const cookieStore = cookies();
+  // const sessionId = cookieStore.get("token");
+
+  // console.log(`Session ID: ${sessionId}`);
   const [url, setUrl] = useState("********");
   const [schedule, setSchedule] = useState("* * * * *");
+  const [scheduleId, setScheduleId] = useState("");
   const [pingData, setPingData] = useState<PingObject[]>([]);
+  const [buttonsLoading, setButtonsLoading] = useState(true);
+
+  const [sessionToken, setSessionToken] = useState("");
+
   const { toast } = useToast();
   useEffect(() => {
     const intervalId = setInterval(getPingData, 4000);
@@ -79,21 +66,46 @@ export default function Home() {
 
   useEffect(() => {
     (async () => {
-      const url = (await redis.get("current_ping_url")) as string;
-      const schedule = (await redis.get("current_ping_schedule")) as string;
+      const res = await fetch("/api/getCookies");
+      const data = await res.json();
+      const { sessionToken } = data;
+      setSessionToken(sessionToken);
+
+      console.log(data);
+      const sessionData = await redis.hgetall(`session_data:${sessionToken}`);
+      console.log(sessionData);
+      // const {url} = sessionData;
+      if (!sessionData) {
+        setButtonsLoading(false);
+        return;
+      }
+      const { url, schedule, scheduleId } = sessionData as Record<
+        string,
+        string
+      >;
 
       if (url) {
+        console.log("URL");
         setUrl(url);
       }
       if (schedule) {
+        console.log("schedule");
         setSchedule(schedule);
       }
+      if (scheduleId) {
+        console.log("scheduleid");
+        setScheduleId(scheduleId);
+      }
+      setButtonsLoading(false);
     })();
   }, []);
 
   const getPingData = async () => {
+    if (!scheduleId) return;
     console.log("HERE");
-    const len = (await redis.json.arrlen(`ping_data:${url}`))[0];
+    const len = (
+      await redis.json.arrlen(`ping_data:${sessionToken}:${url}`)
+    )[0];
     if (!len) {
       setPingData([]);
       return;
@@ -102,7 +114,7 @@ export default function Home() {
     const start = Math.max(0, len - 20);
 
     const data = (await redis.json.get(
-      `ping_data:${url}`,
+      `ping_data:${sessionToken}:${url}`,
       `$[${start}:]`
     )) as PingObject[];
     console.log(data);
@@ -111,20 +123,31 @@ export default function Home() {
   };
 
   const resetPingData = async () => {
-    const res = await redis.json.clear(`ping_data:${url}`, "$");
+    const res = await redis.json.clear(`ping_data:${sessionToken}:${url}`, "$");
     setPingData([]);
     return res;
   };
 
-  const handleSubmit = async (scheduleRequest: CreateScheduleRequest) => {
+  const handleSubmit = async (
+    scheduleRequest: CreateScheduleRequest,
+    create: boolean
+  ) => {
     const res = await fetch("/api/updateSchedule", {
       method: "POST",
-      body: JSON.stringify(scheduleRequest),
+      body: JSON.stringify({ ...scheduleRequest, sessionToken, create }),
     });
-    if (url !== scheduleRequest.destination) {
-      await redis.json.set(`ping_data:${scheduleRequest.destination}`, "$", []);
+    if (url !== scheduleRequest.destination || create) {
+      console.log("URL CHANGED", sessionToken, scheduleRequest.destination);
+      await redis.json.set(
+        `ping_data:${sessionToken}:${scheduleRequest.destination}`,
+        "$",
+        []
+      );
     }
-    await redis.set("current_ping_url", scheduleRequest.destination);
+
+    await redis.hset(`session_data:${sessionToken}`, {
+      url: scheduleRequest.destination,
+    });
     console.log(await res.json());
   };
   const formSchema = zod.object({
@@ -138,27 +161,50 @@ export default function Home() {
     resolver: zodResolver(formSchema),
   });
 
-  function onSubmit(data: zod.infer<typeof formSchema>) {
+  function onSubmitEdit(data: zod.infer<typeof formSchema>) {
     console.log(data);
-    handleSubmit({
-      destination: data.url,
-      cron: data.schedule,
-    });
+    handleSubmit(
+      {
+        destination: data.url,
+        cron: data.schedule,
+      },
+      false
+    );
 
     if (data.url !== url) {
       setUrl(data.url);
-      redis.set("current_ping_url", data.url);
+      redis.hset(`session_data:${sessionToken}`, { url: data.url });
       resetPingData();
     }
     if (data.schedule !== schedule) {
       setSchedule(data.schedule);
-      redis.set("current_ping_schedule", data.schedule);
+      redis.hset(`session_data:${sessionToken}`, { schedule: data.schedule });
     }
     toast({
       title: "Success!",
       description: "Your healthcheck has been updated.",
     });
   }
+
+  function onSubmitCreate(data: zod.infer<typeof formSchema>) {
+    console.log(data);
+    handleSubmit(
+      {
+        destination: data.url,
+        cron: data.schedule,
+      },
+      true
+    );
+    toast({
+      title: "Success!",
+      description: "Your healthcheck has been updated.",
+    });
+
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000);
+  }
+
   return (
     <>
       <Toaster />
@@ -169,135 +215,86 @@ export default function Home() {
             <Description url={url} cron={schedule} />
           </CardHeader>
           <CardContent>
-            <div className="mt-4">
-              <LineChart
-                width={730}
-                height={250}
-                data={pingData}
-                margin={{ top: 0, right: 30, left: 20, bottom: 5 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="time" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Line type="monotone" dataKey="ping" stroke="#8884d8" />
-              </LineChart>
-            </div>
+            <Chart data={pingData} />
           </CardContent>
           <CardFooter className="flex justify-end">
             <div className="flex justify-between w-min gap-2">
-              <Button
-                variant={"default"}
-                onClick={async () => {
-                  console.log({ url });
-                  const data = await fetch("/api/ping", {
-                    method: "POST",
-                    body: JSON.stringify({ url }),
-                  });
-                  // console.log(data);
-                }}
-                className="whitespace-nowrap"
-              >
-                Send Ping
-              </Button>
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button variant="outline">Edit</Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px]">
-                  <DialogHeader>
-                    <DialogTitle>Edit Healthcheck</DialogTitle>
-                    <DialogDescription>
-                      Make changes to the healthcheck here. Click save when
-                      youre done.
-                    </DialogDescription>
-                  </DialogHeader>
-                  <Form {...form}>
-                    <form
-                      className="grid gap-4 py-4"
-                      onSubmit={form.handleSubmit(onSubmit)}
-                    >
-                      <FormField
-                        name="url"
-                        control={form.control}
-                        defaultValue={url}
-                        render={({ field }) => {
-                          return (
-                            <FormItem className="grid grid-cols-4 items-center gap-4">
-                              <FormLabel htmlFor="url" className="text-right">
-                                URL
-                              </FormLabel>
-                              <Input
-                                id="name"
-                                className="col-span-3"
-                                {...field}
-                              />
-                              <FormMessage className="whitespace-nowrap" />
-                            </FormItem>
-                          );
-                        }}
+              {buttonsLoading ? (
+                <div>Loading...</div>
+              ) : sessionToken && scheduleId ? (
+                <>
+                  <Button
+                    variant={"default"}
+                    onClick={async () => {
+                      console.log({ url });
+                      const data = await fetch("/api/ping", {
+                        method: "POST",
+                        body: JSON.stringify({ url, sessionToken }),
+                      });
+                      // console.log(data);
+                    }}
+                    className="whitespace-nowrap"
+                  >
+                    Send Ping
+                  </Button>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button variant="outline">Edit</Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[425px]">
+                      <DialogHeader>
+                        <DialogTitle>Edit Healthcheck</DialogTitle>
+                        <DialogDescription>
+                          Make changes to the healthcheck here. Click save when
+                          youre done.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <EditForm
+                        onSubmit={onSubmitEdit}
+                        url={url}
+                        schedule={schedule}
+                        form={form}
+                        isValid={form.formState.isValid}
+                        create={false}
                       />
-                      <FormField
-                        name="schedule"
-                        control={form.control}
-                        defaultValue={schedule}
-                        render={({ field }) => {
-                          return (
-                            <FormItem className="grid grid-cols-4 items-center gap-4 w-full">
-                              <FormLabel className="text-right">
-                                Schedule
-                              </FormLabel>
-                              <Select
-                                onValueChange={field.onChange}
-                                defaultValue={field.value}
-                              >
-                                <SelectTrigger className="col-span-3">
-                                  <SelectValue placeholder="Every * * * * *" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectGroup>
-                                    <SelectItem value="* * * * *">
-                                      every minute
-                                    </SelectItem>
-                                    <SelectItem value="*/5 * * * *">
-                                      every 5 minutes
-                                    </SelectItem>
-                                    <SelectItem value="*/10 * * * *">
-                                      every 10 minutes
-                                    </SelectItem>
-                                    <SelectItem value="*/30 * * * *">
-                                      every 30 minutes
-                                    </SelectItem>
-                                    <SelectItem value="0 * * * *">
-                                      every hour
-                                    </SelectItem>
-                                  </SelectGroup>
-                                </SelectContent>
-                              </Select>
-                              <FormMessage />
-                            </FormItem>
-                          );
-                        }}
-                      />
-                      <DialogFooter>
-                        <DialogTrigger asChild>
-                          <Button type="submit">Save</Button>
-                        </DialogTrigger>
-                      </DialogFooter>
-                    </form>
-                  </Form>
-                </DialogContent>
-              </Dialog>
-              <Button
-                variant={"destructive"}
-                onClick={() => {
-                  const data = resetPingData();
-                  console.log(data);
-                }}
-              >
-                Reset
-              </Button>
+                    </DialogContent>
+                  </Dialog>
+                  <Button
+                    variant={"destructive"}
+                    onClick={() => {
+                      const data = resetPingData();
+                      console.log(data);
+                    }}
+                  >
+                    Reset
+                  </Button>
+                </>
+              ) : (
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button variant="default" className="whitespace-nowrap">
+                      Create Schedule
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                      <DialogTitle>Create Healthcheck</DialogTitle>
+                      <DialogDescription>
+                        Create your healthcheck schedule here. Click create when
+                        youre done.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <EditForm
+                      onSubmit={onSubmitCreate}
+                      url={url}
+                      schedule={schedule}
+                      form={form}
+                      isValid={form.formState.isValid}
+                      create={true}
+                    />
+                  </DialogContent>
+                </Dialog>
+              )}
             </div>
           </CardFooter>
         </Card>
