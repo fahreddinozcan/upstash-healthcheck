@@ -67,6 +67,7 @@ export default function Home() {
 
   useEffect(() => {
     (async () => {
+      getPingData();
       const res = await fetch("/api/getCookies");
       const data = await res.json();
       const { sessionToken } = data;
