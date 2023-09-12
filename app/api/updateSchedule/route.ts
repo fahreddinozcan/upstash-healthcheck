@@ -5,10 +5,11 @@ import type { CreateScheduleRequest } from "@upstash/qstash";
 const token =
   "eyJVc2VySUQiOiJmOTAzN2EwNS1jYWE2LTRhZjctYTVhOS1jNWM1NWZkY2UyMGMiLCJQYXNzd29yZCI6IjFhMTg1NmNkOGFlYjQ2YWZiMmRmOWJhNzQ1ODMxNTIxIn0=";
 
+const redis_url = process.env.UPSTASH_REDIS_REST_URL;
+const redis_token = process.env.UPSTASH_REDIS_REST_TOKEN;
 const redis = new Redis({
-  url: "https://united-lamprey-34660.upstash.io",
-  token:
-    "AYdkASQgMjg0NTE4OGUtODZkYi00NTE2LWIyNTUtMjE4NDVlNmJmZjY3NWE5YWYxYmEyOTA0NDIxMTk3Y2FjNmQwZTA3ZmUzZjg=",
+  url: redis_url as string,
+  token: redis_token as string,
 });
 const listSchedules = async () => {
   const res = await fetch("https://qstash.upstash.io/v2/schedules", {
