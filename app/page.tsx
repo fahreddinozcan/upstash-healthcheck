@@ -35,13 +35,13 @@ import { Chart } from "./components/Chart";
 import { EditForm } from "./components/EditForm";
 import { Spinner } from "./components/Spinner";
 
-const REDISurl = process.env.NEXT_PUBLIC_UPSTASH_REDIS_RESTURL
+const REDISurl = process.env.NEXT_PUBLIC_UPSTASH_REDIS_REST_URL;
 const token = process.env.NEXT_PUBLIC_UPSTASH_REDIS_REST_TOKEN
 const tokenVALUE = process.env.NEXT_PUBLIC_TOKEN_VALUE
 const redis = new Redis({
-  url: "https://united-lamprey-34660.upstash.io",
+  url: process.env.NEXT_PUBLIC_UPSTASH_REDIS_REST_URL as string,
   token:
-    "AYdkASQgMjg0NTE4OGUtODZkYi00NTE2LWIyNTUtMjE4NDVlNmJmZjY3NWE5YWYxYmEyOTA0NDIxMTk3Y2FjNmQwZTA3ZmUzZjg=",
+    process.env.NEXT_PUBLIC_UPSTASH_REDIS_REST_TOKEN as string,
 });
 
 type PingObject = {
