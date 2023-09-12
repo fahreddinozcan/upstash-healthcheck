@@ -215,7 +215,7 @@ export default function Home() {
       <div className="w-full flex-col flex items-center justify-center gap-10 mt-20">
         <Card className="w-min p-4 mt-5">
           <CardHeader>
-            <CardTitle>testHealth Check, {REDISurl? "YES": "NO"}, {token? "YES": "NO"}, {tokenVALUE? "YES": "NO"}</CardTitle>
+            <CardTitle>testHealth Check, {UPSTASHurl? "YES": "NO"}, {UPSTASHtoken? "YES": "NO"}, {REDIStoken? "YES": "NO"}, {REDISurl? "YES": "NO"}</CardTitle>
             <Description url={url} cron={schedule} />
           </CardHeader>
           <CardContent>
