@@ -37,6 +37,7 @@ import { Spinner } from "./components/Spinner";
 
 const REDISurl = process.env.NEXT_PUBLIC_UPSTASH_REDIS_REST_URL
 const token = process.env.NEXT_PUBLIC_UPSTASH_REDIS_REST_TOKEN
+const tokenVALUE = process.env.NEXT_PUBLIC_TOKEN_VALUE
 const redis = new Redis({
   url: "https://united-lamprey-34660.upstash.io",
   token:
