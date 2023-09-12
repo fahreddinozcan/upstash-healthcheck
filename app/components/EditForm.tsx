@@ -23,11 +23,7 @@ import { Redis } from "@upstash/redis";
 import { SelectGroup } from "@radix-ui/react-select";
 import { useForm, UseFormReturn } from "react-hook-form";
 
-const redis = new Redis({
-  url: "https://united-lamprey-34660.upstash.io",
-  token:
-    "AYdkASQgMjg0NTE4OGUtODZkYi00NTE2LWIyNTUtMjE4NDVlNmJmZjY3NWE5YWYxYmEyOTA0NDIxMTk3Y2FjNmQwZTA3ZmUzZjg=",
-});
+
 
 export const EditForm = ({
   url,
@@ -86,7 +82,6 @@ export const EditForm = ({
                 <Select
                   onValueChange={field.onChange}
                   value={create ? undefined : field.value}
-                  // defaultValue={create ? undefined : field.value}
                 >
                   <SelectTrigger className="col-span-3">
                     <SelectValue
