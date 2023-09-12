@@ -35,14 +35,20 @@ import { Chart } from "./components/Chart";
 import { EditForm } from "./components/EditForm";
 import { Spinner } from "./components/Spinner";
 
-
-const redis = Redis.fromEnv()
+const REDISurl = process.env.UPSTASH_REDIS_REST_URL
+const token = process.env.UPSTASH_REDIS_REST_TOKEN
+const redis = new Redis({
+  url: "https://united-lamprey-34660.upstash.io",
+  token:
+    "AYdkASQgMjg0NTE4OGUtODZkYi00NTE2LWIyNTUtMjE4NDVlNmJmZjY3NWE5YWYxYmEyOTA0NDIxMTk3Y2FjNmQwZTA3ZmUzZjg=",
+});
 
 type PingObject = {
   time: string;
   ping: number;
 };
 export default function Home() {
+
   // const cookieStore = cookies();
   // const sessionId = cookieStore.get("token");
 
@@ -206,7 +212,7 @@ export default function Home() {
       <div className="w-full flex-col flex items-center justify-center gap-10 mt-20">
         <Card className="w-min p-4 mt-5">
           <CardHeader>
-            <CardTitle>Health Check</CardTitle>
+            <CardTitle>Health Check, {REDISurl}, {token}</CardTitle>
             <Description url={url} cron={schedule} />
           </CardHeader>
           <CardContent>
