@@ -35,8 +35,10 @@ import { Chart } from "./components/Chart";
 import { EditForm } from "./components/EditForm";
 import { Spinner } from "./components/Spinner";
 
-const REDISurl = process.env.NEXT_PUBLIC_UPSTASH_REDIS_REST_URL;
-const token = process.env.NEXT_PUBLIC_UPSTASH_REDIS_REST_TOKEN
+const UPSTASHurl = process.env.UPSTASH_REDIS_REST_URL;
+const UPSTASHtoken = process.env.UPSTASH_REDIS_REST_TOKEN
+const REDISurl = process.env.REST_URL
+const REDIStoken = process.env.REST_TOKEN
 const tokenVALUE = process.env.NEXT_PUBLIC_TOKEN_VALUE
 const redis = new Redis({
   url: process.env.NEXT_PUBLIC_UPSTASH_REDIS_REST_URL as string,
