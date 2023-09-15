@@ -79,6 +79,7 @@ export default function Home() {
       // const {url} = sessionData;
       if (!sessionData) {
         setButtonsLoading(false);
+        setDescLoading(false);
         return;
       }
       const { url, schedule, scheduleId } = sessionData as Record<
@@ -95,8 +96,8 @@ export default function Home() {
       if (scheduleId) {
         setScheduleId(scheduleId);
       }
-      setButtonsLoading(false);
       setDescLoading(false);
+      setButtonsLoading(false);
     })();
   });
 
@@ -332,7 +333,9 @@ function Description({
     <>
       <CardDescription>
         {descLoading ? (
-          <Spinner />
+          <div className="w-full flex items-center justify-center">
+            <Spinner />
+          </div>
         ) : scheduleId ? (
           <>
             Currently making healthcheck for{" "}
