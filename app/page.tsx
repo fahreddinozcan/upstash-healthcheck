@@ -333,9 +333,13 @@ function Description({
     <>
       <CardDescription>
         {descLoading ? (
-          <div className="w-full flex items-center justify-center">
-            <Spinner />
-          </div>
+          // <div className="w-full flex items-center justify-center">
+          //   <Spinner />
+          // </div>
+          <>
+            This is an API healthcheck example created by Upstash using QStash,
+            Redis and Next.js. Create a schedule to start.
+          </>
         ) : scheduleId ? (
           <>
             Currently making healthcheck for{" "}
