@@ -35,15 +35,10 @@ import { Chart } from "./components/Chart";
 import { EditForm } from "./components/EditForm";
 import { Spinner } from "./components/Spinner";
 
-const UPSTASHurl = process.env.NEXT_PUBLIC_UPSTASH_REDIS_REST_URL;
-const UPSTASHtoken = process.env.NEXT_PUBLIC_UPSTASH_REDIS_REST_TOKEN
-const REDISurl = process.env.NEXT_PUBLIC_REST_URL
-const REDIStoken = process.env.REST_TOKEN
-const tokenVALUE = process.env.NEXT_PUBLIC_TOKEN_VALUE
 const redis = new Redis({
-  url: process.env.NEXT_PUBLIC_UPSTASH_REDIS_REST_URL as string,
+  url: "https://united-lamprey-34660.upstash.io",
   token:
-    process.env.NEXT_PUBLIC_UPSTASH_REDIS_REST_TOKEN as string,
+    "AYdkASQgMjg0NTE4OGUtODZkYi00NTE2LWIyNTUtMjE4NDVlNmJmZjY3NWE5YWYxYmEyOTA0NDIxMTk3Y2FjNmQwZTA3ZmUzZjg=",
 });
 
 type PingObject = {
@@ -51,7 +46,6 @@ type PingObject = {
   ping: number;
 };
 export default function Home() {
-
   // const cookieStore = cookies();
   // const sessionId = cookieStore.get("token");
 
@@ -215,7 +209,7 @@ export default function Home() {
       <div className="w-full flex-col flex items-center justify-center gap-10 mt-20">
         <Card className="w-min p-4 mt-5">
           <CardHeader>
-            <CardTitle>testHealth Check, {UPSTASHurl? "YES": "NO"}, {UPSTASHtoken? "YES": "NO"}, {REDIStoken? "YES": "NO"}, {REDISurl? "YES": "NO"}</CardTitle>
+            <CardTitle>Health Check</CardTitle>
             <Description url={url} cron={schedule} />
           </CardHeader>
           <CardContent>
