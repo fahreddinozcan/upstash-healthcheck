@@ -16,7 +16,10 @@ async function handler(request: NextRequest) {
   const { url, sessionToken } = await request.json();
 
   const currentDate = new Date();
-  const time = currentDate.getHours() + ":" + currentDate.getMinutes();
+  const time =
+    currentDate.getHours().toString().padStart(2, "0") +
+    ":" +
+    currentDate.getMinutes().toString().padStart(2, "0");
 
   const currentTime = Date.now();
   await axios.get(`${url}`);
