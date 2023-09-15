@@ -55,6 +55,7 @@ export default function Home() {
   const [scheduleId, setScheduleId] = useState("");
   const [pingData, setPingData] = useState<PingObject[]>([]);
   const [buttonsLoading, setButtonsLoading] = useState(true);
+  const [descLoading, setDescLoading] = useState(true);
 
   const [sessionToken, setSessionToken] = useState("");
 
@@ -95,6 +96,7 @@ export default function Home() {
         setScheduleId(scheduleId);
       }
       setButtonsLoading(false);
+      setDescLoading(false);
     })();
   });
 
@@ -210,7 +212,12 @@ export default function Home() {
         <Card className="w-min p-4 mt-5">
           <CardHeader>
             <CardTitle>Health Check</CardTitle>
-            <Description url={url} cron={schedule} scheduleId={scheduleId} />
+            <Description
+              url={url}
+              cron={schedule}
+              scheduleId={scheduleId}
+              descLoading={descLoading}
+            />
           </CardHeader>
           <CardContent>
             <Chart data={pingData} />
@@ -306,10 +313,12 @@ function Description({
   url,
   cron,
   scheduleId,
+  descLoading,
 }: {
   url: string;
   cron: string;
   scheduleId: string;
+  descLoading: boolean;
 }) {
   const schedules: Record<string, string> = {
     "* * * * *": "every minute",
@@ -322,7 +331,9 @@ function Description({
   return (
     <>
       <CardDescription>
-        {scheduleId ? (
+        {descLoading ? (
+          <Spinner />
+        ) : scheduleId ? (
           <>
             Currently making healthcheck for{" "}
             <span className="font-bold">{url}</span> with the schedule of{" "}
