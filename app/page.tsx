@@ -210,7 +210,7 @@ export default function Home() {
         <Card className="w-min p-4 mt-5">
           <CardHeader>
             <CardTitle>Health Check</CardTitle>
-            <Description url={url} cron={schedule} />
+            <Description url={url} cron={schedule} scheduleId={scheduleId} />
           </CardHeader>
           <CardContent>
             <Chart data={pingData} />
@@ -302,7 +302,15 @@ export default function Home() {
   );
 }
 
-function Description({ url, cron }: { url: string; cron: string }) {
+function Description({
+  url,
+  cron,
+  scheduleId,
+}: {
+  url: string;
+  cron: string;
+  scheduleId: string;
+}) {
   const schedules: Record<string, string> = {
     "* * * * *": "every minute",
     "*/5 * * * *": "every 5 minutes",
@@ -312,12 +320,23 @@ function Description({ url, cron }: { url: string; cron: string }) {
     "0 * * * *": "every hour",
   };
   return (
-    <CardDescription>
-      Currently making healthcheck for <span className="font-bold">{url}</span>{" "}
-      with the schedule of{" "}
-      <span className="font-bold">
-        {schedules[cron]} ({cron})
-      </span>
-    </CardDescription>
+    <>
+      <CardDescription>
+        {scheduleId ? (
+          <>
+            Currently making healthcheck for{" "}
+            <span className="font-bold">{url}</span> with the schedule of{" "}
+            <span className="font-bold">
+              {schedules[cron]} ({cron})
+            </span>
+          </>
+        ) : (
+          <>
+            This is an API healthcheck example created by Upstash using QStash,
+            Redis and Next.js. Create a schedule to start.
+          </>
+        )}
+      </CardDescription>
+    </>
   );
 }

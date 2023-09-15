@@ -32,6 +32,5 @@ export async function POST(req: NextRequest) {
     "$",
     JSON.stringify(pingData)
   );
-
   return NextResponse.json({ ping: pingTime, time: time });
 }
