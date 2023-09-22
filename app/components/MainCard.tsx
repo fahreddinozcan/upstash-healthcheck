@@ -8,29 +8,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 
-import { CreateScheduleRequest } from "@upstash/qstash";
 import { Chart } from "./Chart";
-import { EditForm } from "./EditForm";
 import { Toaster } from "@/components/ui/toaster";
-import { useToast } from "@/components/ui/use-toast";
-import { Button } from "@/components/ui/button";
-import * as zod from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
 import { EditDialog } from "./EditDialog";
-import { Edit } from "lucide-react";
 import { SendPingButton } from "./SendPingButtton";
 import { ResetDataButton } from "./ResetDataButton";
+import { cookies } from "next/headers";
 
 const redis = new Redis({
   url: "https://united-lamprey-34660.upstash.io",
@@ -38,20 +22,25 @@ const redis = new Redis({
     "AYdkASQgMjg0NTE4OGUtODZkYi00NTE2LWIyNTUtMjE4NDVlNmJmZjY3NWE5YWYxYmEyOTA0NDIxMTk3Y2FjNmQwZTA3ZmUzZjg=",
 });
 
-export async function MainCard() {
-  const resCookies = await fetch(
-    `https://healthcheck.upstash.app/api/getCookies`
-  );
-  const data = await resCookies.json();
-  const { sessionToken } = data;
+export async function getSessionToken() {
+  const cookieStore = cookies();
 
-  const resetPingData = async () => {
-    const res = await redis.json.clear(
-      `ping_data:${sessionToken}:${urlData}`,
-      "$"
-    );
-    return res;
-  };
+  let sessionTokenData = cookieStore.get("session_token");
+
+  if (sessionTokenData) {
+    let sessionToken = sessionTokenData.value;
+    return sessionToken;
+  }
+
+  let sessionToken = (Date.now() - Math.floor(Math.random() * 100)).toString();
+
+  cookieStore.set("session_token", sessionToken);
+
+  return sessionToken;
+}
+
+export async function MainCard() {
+  const sessionToken = await getSessionToken();
 
   const sessionData = await redis.hgetall(`session_data:${sessionToken}`);
   // if (!sessionData) {
