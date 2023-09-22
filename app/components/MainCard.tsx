@@ -22,25 +22,12 @@ const redis = new Redis({
     "AYdkASQgMjg0NTE4OGUtODZkYi00NTE2LWIyNTUtMjE4NDVlNmJmZjY3NWE5YWYxYmEyOTA0NDIxMTk3Y2FjNmQwZTA3ZmUzZjg=",
 });
 
-export async function getSessionToken() {
-  const cookieStore = cookies();
-
-  let sessionTokenData = cookieStore.get("session_token");
-
-  if (sessionTokenData) {
-    let sessionToken = sessionTokenData.value;
-    return sessionToken;
-  }
-
-  let sessionToken = (Date.now() - Math.floor(Math.random() * 100)).toString();
-
-  cookieStore.set("session_token", sessionToken);
-
-  return sessionToken;
-}
-
 export async function MainCard() {
-  const sessionToken = await getSessionToken();
+  const resCookies = await fetch(
+    `https://healthcheck.upstash.app/api/getCookies`
+  );
+  const data = await resCookies.json();
+  const { sessionToken } = data;
 
   const sessionData = await redis.hgetall(`session_data:${sessionToken}`);
   // if (!sessionData) {
