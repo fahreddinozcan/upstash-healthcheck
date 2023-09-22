@@ -77,7 +77,7 @@ export function Chart({
       >
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey="time" />
-        <YAxis />
+        <YAxis unit="ms" />
         <Tooltip />
         <Legend />
         <Line type="monotone" dataKey="ping" stroke="#8884d8" />
