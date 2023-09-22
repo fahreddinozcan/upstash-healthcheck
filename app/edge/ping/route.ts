@@ -35,7 +35,6 @@ async function handler(request: NextRequest) {
     "$",
     JSON.stringify(pingData)
   );
-  console.log(res);
 
   return NextResponse.json({ ping: pingTime, time: time });
 }
