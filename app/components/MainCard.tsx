@@ -39,7 +39,7 @@ const redis = new Redis({
 });
 
 export async function MainCard() {
-  const resCookies = await fetch("http://localhost:3000/api/getCookies");
+  const resCookies = await fetch(`${process.env.VERCEL_URL}/api/getCookies`);
   const data = await resCookies.json();
   const { sessionToken } = data;
 
