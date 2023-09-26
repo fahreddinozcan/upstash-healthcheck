@@ -15,7 +15,6 @@ import { EditDialog } from "./EditDialog";
 import { SendPingButton } from "./SendPingButtton";
 import { ResetDataButton } from "./ResetDataButton";
 import { cookies } from "next/headers";
-import { setCookie } from "./Cookies";
 
 const redis = new Redis({
   url: "https://united-lamprey-34660.upstash.io",
@@ -23,40 +22,10 @@ const redis = new Redis({
     "AYdkASQgMjg0NTE4OGUtODZkYi00NTE2LWIyNTUtMjE4NDVlNmJmZjY3NWE5YWYxYmEyOTA0NDIxMTk3Y2FjNmQwZTA3ZmUzZjg=",
 });
 
-export async function getSessionToken() {
-  const cookieStore = cookies();
-
-  let sessionTokenData = cookieStore.get("session_token");
-
-  if (sessionTokenData) {
-    let sessionToken = sessionTokenData.value;
-    return { sessionToken };
-  }
-
-  // let sessionToken = (Date.now() - Math.floor(Math.random() * 100)).toString();
-
-  // setCookie({ token: sessionToken });
-  const resCookies = await fetch(
-    `https://healthcheck.upstash.app/api/getCookies`
-  );
-  const data = await resCookies.json();
-
-  return { sessionToken: data };
-}
-
 export async function MainCard() {
-  // const resCookies = await fetch(
-  //   `https://healthcheck.upstash.app/api/getCookies`
-  // );
-  // const data = await resCookies.json();
-  const { sessionToken } = await getSessionToken();
+  const sessionToken = cookies().get("session_token")?.value as string;
 
   const sessionData = await redis.hgetall(`session_data:${sessionToken}`);
-  // if (!sessionData) {
-  //   return "Selam";
-  // }
-
-  // const { url, schedule, scheduleId } = sessionData as Record<string, string>;
 
   const urlData = sessionData?.url as string;
   const scheduleData = sessionData?.schedule as string;
