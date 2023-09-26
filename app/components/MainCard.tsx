@@ -104,7 +104,7 @@ function Description({
         {scheduleId && url && cron ? (
           <>
             Currently making healthcheck for{" "}
-            <span className="font-bold">{url}</span> with the schedule of{" "}
+            <span className="font-bold">{url}</span> with the frequency of{" "}
             <span className="font-bold">
               {schedules[cron]} ({cron})
             </span>
