@@ -1,13 +1,9 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Redis } from "@upstash/redis";
+import { RedisClient } from "../libs/redis-client";
 
-const redis = new Redis({
-  url: "https://united-lamprey-34660.upstash.io",
-  token:
-    "AYdkASQgMjg0NTE4OGUtODZkYi00NTE2LWIyNTUtMjE4NDVlNmJmZjY3NWE5YWYxYmEyOTA0NDIxMTk3Y2FjNmQwZTA3ZmUzZjg=",
-});
+const redis = RedisClient();
 
 export const ResetDataButton = ({
   sessionToken,

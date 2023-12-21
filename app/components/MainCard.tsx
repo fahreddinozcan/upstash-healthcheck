@@ -15,12 +15,9 @@ import { EditDialog } from "./EditDialog";
 import { SendPingButton } from "./SendPingButtton";
 import { ResetDataButton } from "./ResetDataButton";
 import { cookies } from "next/headers";
+import { RedisClient } from "../libs/redis-client";
 
-const redis = new Redis({
-  url: "https://united-lamprey-34660.upstash.io",
-  token:
-    "AYdkASQgMjg0NTE4OGUtODZkYi00NTE2LWIyNTUtMjE4NDVlNmJmZjY3NWE5YWYxYmEyOTA0NDIxMTk3Y2FjNmQwZTA3ZmUzZjg=",
-});
+const redis = RedisClient();
 
 export async function MainCard() {
   const sessionToken = cookies().get("session_token")?.value as string;
@@ -34,8 +31,8 @@ export async function MainCard() {
   return (
     <>
       <Toaster />
-      <div className="w-full flex-col flex items-center justify-center gap-10 mt-20">
-        <Card className="w-min p-4 mt-5">
+      <div className="flex flex-col items-center justify-center w-full gap-10 mt-20">
+        <Card className="p-4 mt-5 w-min">
           <CardHeader>
             <CardTitle>Health Check</CardTitle>
 
@@ -53,7 +50,7 @@ export async function MainCard() {
             />
           </CardContent>
           <CardFooter className="flex justify-end">
-            <div className="flex justify-between w-min gap-2">
+            <div className="flex justify-between gap-2 w-min">
               {sessionToken && scheduleIdData ? (
                 <>
                   <SendPingButton sessionToken={sessionToken} url={urlData} />

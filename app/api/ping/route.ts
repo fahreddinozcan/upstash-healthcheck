@@ -1,16 +1,12 @@
 import { NextResponse, NextRequest } from "next/server";
-import { Redis } from "@upstash/redis";
 import axios from "axios";
+import { RedisClient } from "@/app/libs/redis-client";
 
-const redis = new Redis({
-  url: "https://united-lamprey-34660.upstash.io",
-  token:
-    "AYdkASQgMjg0NTE4OGUtODZkYi00NTE2LWIyNTUtMjE4NDVlNmJmZjY3NWE5YWYxYmEyOTA0NDIxMTk3Y2FjNmQwZTA3ZmUzZjg=",
-});
+const redis = RedisClient();
 
 export async function POST(req: NextRequest) {
   const data = await req.json();
-  // console.log(data);
+
   const { sessionToken } = data;
   const currentDate = new Date();
   const time =

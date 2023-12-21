@@ -18,12 +18,9 @@ import {
 import { DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Redis } from "@upstash/redis";
 
 import { SelectGroup } from "@radix-ui/react-select";
-import { useForm, UseFormReturn } from "react-hook-form";
-
-
+import { UseFormReturn } from "react-hook-form";
 
 export const EditForm = ({
   url,
@@ -56,7 +53,7 @@ export const EditForm = ({
           defaultValue={create ? "" : url}
           render={({ field }) => {
             return (
-              <FormItem className="grid grid-cols-4 items-center gap-4">
+              <FormItem className="grid items-center grid-cols-4 gap-4">
                 <FormLabel htmlFor="url" className="text-right">
                   URL
                 </FormLabel>
@@ -77,7 +74,7 @@ export const EditForm = ({
           defaultValue={create ? undefined : schedule}
           render={({ field }) => {
             return (
-              <FormItem className="grid grid-cols-4 items-center gap-4 w-full">
+              <FormItem className="grid items-center w-full grid-cols-4 gap-4">
                 <FormLabel className="text-right">Schedule</FormLabel>
                 <Select
                   onValueChange={field.onChange}

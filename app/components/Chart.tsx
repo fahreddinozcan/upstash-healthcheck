@@ -9,14 +9,11 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { Redis } from "@upstash/redis";
 import { useEffect, useState } from "react";
 
-const redis = new Redis({
-  url: "https://united-lamprey-34660.upstash.io",
-  token:
-    "AYdkASQgMjg0NTE4OGUtODZkYi00NTE2LWIyNTUtMjE4NDVlNmJmZjY3NWE5YWYxYmEyOTA0NDIxMTk3Y2FjNmQwZTA3ZmUzZjg=",
-});
+import { RedisClient } from "../libs/redis-client";
+
+const redis = RedisClient();
 
 type PingObject = {
   time: string;
@@ -62,7 +59,6 @@ export function Chart({
       `ping_data:${sessionToken}:${url}`,
       `$[${start}:]`
     )) as PingObject[];
-    // console.log(data);
 
     setPingData(data);
   };

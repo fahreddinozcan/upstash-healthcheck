@@ -1,23 +1,29 @@
 import { Toaster } from "@/components/ui/toaster";
-import { Redis } from "@upstash/redis";
+import { UpstashLogo } from "@/public/upstash-logo";
 import { MainCard } from "./components/MainCard";
 
-const redis = new Redis({
-  url: "https://united-lamprey-34660.upstash.io",
-  token:
-    "AYdkASQgMjg0NTE4OGUtODZkYi00NTE2LWIyNTUtMjE4NDVlNmJmZjY3NWE5YWYxYmEyOTA0NDIxMTk3Y2FjNmQwZTA3ZmUzZjg=",
-});
-
-type PingObject = {
-  time: string;
-  ping: number;
-};
 export default function Home() {
   return (
     <>
       <Toaster />
-      <div className="w-full flex-col flex items-center justify-center gap-10 mt-20">
+      <div className="flex flex-col items-center justify-between w-full h-screen">
         <MainCard />
+        <p className="mt-5 text-center">
+          This application is using QStash for serverless task scheduling, and
+          Upstash Redis for storing the state. <br /> You can see the Github
+          repository{" "}
+          <a href="https://github.com" className="font-bold text-blue-500">
+            here
+          </a>{" "}
+          to learn how to utilize Upstash products with Next.js Server Side
+          Rendering.
+        </p>
+        <footer className="flex items-center justify-center w-full gap-3 py-4 bg-black">
+          <span className="font-bold text-white">Powered by</span>
+          <a href="https://www.upstash.com" target="_blank">
+            <UpstashLogo />
+          </a>
+        </footer>
       </div>
     </>
   );

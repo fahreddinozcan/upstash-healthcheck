@@ -1,14 +1,9 @@
-import ping from "pingman";
 import { NextResponse, NextRequest } from "next/server";
-import { Redis } from "@upstash/redis";
 import { verifySignatureEdge } from "@upstash/qstash/dist/nextjs";
 import axios from "axios";
+import { RedisClient } from "@/app/libs/redis-client";
 
-const redis = new Redis({
-  url: "https://united-lamprey-34660.upstash.io",
-  token:
-    "AYdkASQgMjg0NTE4OGUtODZkYi00NTE2LWIyNTUtMjE4NDVlNmJmZjY3NWE5YWYxYmEyOTA0NDIxMTk3Y2FjNmQwZTA3ZmUzZjg=",
-});
+const redis = RedisClient();
 
 export const POST = verifySignatureEdge(handler);
 
@@ -20,8 +15,8 @@ async function handler(request: NextRequest) {
     currentDate.getHours().toString().padStart(2, "0") +
     ":" +
     currentDate.getMinutes().toString().padStart(2, "0");
-
   const currentTime = Date.now();
+
   await axios.get(`${url}`);
   const pingTime = Date.now() - currentTime;
 
@@ -30,7 +25,7 @@ async function handler(request: NextRequest) {
     ping: pingTime,
   };
 
-  const res = await redis.json.arrappend(
+  await redis.json.arrappend(
     `ping_data:${sessionToken}:${url}`,
     "$",
     JSON.stringify(pingData)

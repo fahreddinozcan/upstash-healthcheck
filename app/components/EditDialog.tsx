@@ -4,7 +4,6 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -12,7 +11,6 @@ import {
 
 import { useRouter } from "next/navigation";
 
-import { Redis } from "@upstash/redis";
 import { Button } from "@/components/ui/button";
 import { EditForm } from "./EditForm";
 import { useToast } from "@/components/ui/use-toast";
@@ -20,12 +18,9 @@ import * as zod from "zod";
 import { CreateScheduleRequest } from "@upstash/qstash";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { RedisClient } from "../libs/redis-client";
 
-const redis = new Redis({
-  url: "https://united-lamprey-34660.upstash.io",
-  token:
-    "AYdkASQgMjg0NTE4OGUtODZkYi00NTE2LWIyNTUtMjE4NDVlNmJmZjY3NWE5YWYxYmEyOTA0NDIxMTk3Y2FjNmQwZTA3ZmUzZjg=",
-});
+const redis = RedisClient();
 
 export const EditDialog = ({
   sessionToken,
@@ -49,7 +44,6 @@ export const EditDialog = ({
       body: JSON.stringify({ ...scheduleRequest, sessionToken, create }),
     });
     if (url !== scheduleRequest.destination || create) {
-      console.log("URL CHANGED", sessionToken, scheduleRequest.destination);
       await redis.json.set(
         `ping_data:${sessionToken}:${scheduleRequest.destination}`,
         "$",
@@ -60,15 +54,11 @@ export const EditDialog = ({
     await redis.hset(`session_data:${sessionToken}`, {
       url: scheduleRequest.destination,
     });
-    // console.log(await res.json());
-    // if (typeof window !== "undefined") {
-    //   window.location.reload();
-    // }
+
     router.refresh();
   };
 
   function onSubmitCreate(data: zod.infer<typeof formSchema>) {
-    // console.log(data);
     handleSubmit(
       {
         destination: data.url,
@@ -98,7 +88,6 @@ export const EditDialog = ({
   });
 
   function onSubmitEdit(data: zod.infer<typeof formSchema>) {
-    // console.log(data);
     handleSubmit(
       {
         destination: data.url,
@@ -109,7 +98,6 @@ export const EditDialog = ({
 
     if (data.url !== url) {
       redis.hset(`session_data:${sessionToken}`, { url: data.url });
-      // resetPingData();
     }
     if (data.schedule !== schedule) {
       redis.hset(`session_data:${sessionToken}`, { schedule: data.schedule });
