@@ -1,35 +1,46 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+<br />
+<div align="center">
 
-## Getting Started
+  <h3 align="center">Health Check Application</h3>
 
-First, run the development server:
+  <p align="center">
+    Create an serverless health check service using QStash and Upstash Redis
+  </p>
+</div>
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
+Welcome! This example showcases a uptime monitoring system to observe the stability of your API endpoints and web applications. It uses QStash for task scheduling, Upstash Redis as state store and Next.js, combined with beautiful ShadnUI.
+
+# Project Details
+
+The goal of this project is to create a serverless uptime status checker, without any long running server. To achieve this, we deploy Vercel Edge functions with Next.js, and schedule a job to this endpoints with QStash. Within these functions, we perform the ping operation and write the results to Upstash Redis using the proper data structures. On visit, we retrieve the data in Redis and render the page with Server Side Rendering. There are some additional features that uses Upstash management APIs.
+
+## Scheduling Health Check for Specific Endpoint
+
+We will develop a system designed to consistently monitor the uptime of your endpoint or website. This includes the capability to create, modify, and delete schedules in QStash using its management API. The health and latency data collected will be securely stored in our Redis database, ensuring efficient tracking and accessibility.
+
+## Storing the Data
+
+In this project, we'll utilize redis extensively. Initially, we'll implement state management using tokens. Each user, upon their first visit, will receive a unique token. This token will be instrumental in associating and storing user-specific data. We plan to utilize the Redis JSON structure to store our latency data along with precise timestamps, ensuring structured and searchable data storage. For the client-side, a long polling method will be employed to seamlessly fetch and update this data on our Next.js frontend, enabling real-time data interaction and display.
+
+# Deployment
+
+You can deploy the project using the **Deploy to Vercel** button located in the left sidebar. Alternatively, you can initiate the deployment by creating a new repository from the source code. To deploy, you'll need the credentials below in your environment variables. It's possible to get the necessary credentials from Upstash Console.
+
+```
+QSTASH_CURRENT_SIGNING_KEY=
+QSTASH_NEXT_SIGNING_KEY=
+NEXT_PUBLIC_UPSTASH_REDIS_REST_URL=
+NEXT_PUBLIC_UPSTASH_REDIS_REST_TOKEN=
+QSTASH_REST_TOKEN=
+APP_URL=<YOUR_DEPLOYMENT_URL>
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Learn More
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+To learn more about Upstash and its services, check out the following resources:
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
-# upstash-healthcheck
+- [Documentation](https://docs.upstash.com)
+- [Website](https://upstash.com)
+- [Blog](https://upstash.com/blog)
+- [Console](https://console.upstash.com)
+- [Discord](https://upstash.com/discord)
