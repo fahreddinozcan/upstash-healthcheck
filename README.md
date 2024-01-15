@@ -26,7 +26,9 @@ The goal of this project is to create a serverless uptime status platform withou
 
 # Deployment
 
-You can deploy the project using the **Deploy** button located above. After logging in to vercel, you can start the configuration of the project by filling in the credentials. This is rather a simple process, and you'll have your own deployment under several minutes.
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fupstash%2Fhealthcheck-example&env=QSTASH_CURRENT_SIGNING_KEY,QSTASH_NEXT_SIGNING_KEY,NEXT_PUBLIC_UPSTASH_REDIS_REST_URL,NEXT_PUBLIC_UPSTASH_REDIS_REST_TOKEN,QSTASH_REST_TOKEN,APP_URL)
+
+You can deploy the project using the **Deploy with Vercel** button located above. After logging in to vercel, you can start the configuration of the project by filling in the credentials. This is rather a simple process, and you'll have your own deployment under several minutes.
 
 ![Vercel Credentials](/public/vercel-credentials.png)
 
