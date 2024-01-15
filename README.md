@@ -8,7 +8,7 @@
   </p>
 </div>
 
-Welcome! This example showcases a uptime monitoring system to observe the stability of your API endpoints and web applications. It uses QStash for task scheduling, Upstash Redis as state store and Next.js, combined with beautiful ShadnUI.
+Welcome! This example showcases a uptime monitoring system to observe the stability of your API endpoints and web applications. It uses QStash for task scheduling, Upstash Redis as state store and Next.js, combined with beautiful ShadnUI. You can navigate to the demo [here](https://healthcheck.upstash.app).
 
 # Project Details
 
