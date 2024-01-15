@@ -19,10 +19,10 @@ The goal of this project is to create a serverless uptime status platform withou
 
 ## Stack
 
-App logic: [Next.js](https://nextjs.org)
-Job scheduling: [QStash](https://upstash.com/docs/qstash)
-State store: [Upstash Redis](https://upstash.com/docs/redis)
-UI Library: [ShadcnUI](https://ui.shadcn.com/)
+- App logic: [Next.js](https://nextjs.org)
+- Job scheduling: [QStash](https://upstash.com/docs/qstash)
+- State store and database: [Upstash Redis](https://upstash.com/docs/redis)
+- UI Library: [ShadcnUI](https://ui.shadcn.com/)
 
 # Deployment
 
