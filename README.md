@@ -8,32 +8,46 @@
   </p>
 </div>
 
-Welcome! This example showcases a uptime monitoring system to observe the stability of your API endpoints and web applications. It uses QStash for task scheduling, Upstash Redis as state store and Next.js, combined with beautiful ShadnUI. You can navigate to the demo [here](https://healthcheck.upstash.app).
+[Demo](https://healthcheck.upstash.app)
+![](/public/preview.png)
+
+Welcome! This example showcases a uptime monitoring system to observe the stability of your API endpoints and web applications. It uses QStash for task scheduling, Upstash Redis as state store and Next.js, combined with beautiful ShadnUI.
 
 # Project Details
 
-The goal of this project is to create a serverless uptime status checker, without any long running server. To achieve this, we deploy Vercel Edge functions with Next.js, and schedule a job to this endpoints with QStash. Within these functions, we perform the ping operation and write the results to Upstash Redis using the proper data structures. On visit, we retrieve the data in Redis and render the page with Server Side Rendering. There are some additional features that uses Upstash management APIs.
+The goal of this project is to create a serverless uptime status platform without any long running server. To achieve this, we deploy Vercel Edge functions with Next.js, and schedule a job to this endpoints with QStash. Within this function, we perform the ping operation and write the results to Upstash Redis using the proper data structures. On visit, we retrieve the data from Redis and render the page with Server Side Rendering.
 
-## Scheduling Health Check for Specific Endpoint
+## Stack
 
-We will develop a system designed to consistently monitor the uptime of your endpoint or website. This includes the capability to create, modify, and delete schedules in QStash using its management API. The health and latency data collected will be securely stored in our Redis database, ensuring efficient tracking and accessibility.
-
-## Storing the Data
-
-In this project, we'll utilize redis extensively. Initially, we'll implement state management using tokens. Each user, upon their first visit, will receive a unique token. This token will be instrumental in associating and storing user-specific data. We plan to utilize the Redis JSON structure to store our latency data along with precise timestamps, ensuring structured and searchable data storage. For the client-side, a long polling method will be employed to seamlessly fetch and update this data on our Next.js frontend, enabling real-time data interaction and display.
+App logic: [Next.js](https://nextjs.org)
+Job scheduling: [QStash](https://upstash.com/docs/qstash)
+State store: [Upstash Redis](https://upstash.com/docs/redis)
+UI Library: [ShadcnUI](https://ui.shadcn.com/)
 
 # Deployment
 
-You can deploy the project using the **Deploy to Vercel** button located in the left sidebar. Alternatively, you can initiate the deployment by creating a new repository from the source code. To deploy, you'll need the credentials below in your environment variables. It's possible to get the necessary credentials from Upstash Console.
+You can deploy the project using the **Deploy** button located above. After logging in to vercel, you can start the configuration of the project by filling in the credentials. This is rather a simple process, and you'll have your own deployment under several minutes.
 
-```
-QSTASH_CURRENT_SIGNING_KEY=
-QSTASH_NEXT_SIGNING_KEY=
-NEXT_PUBLIC_UPSTASH_REDIS_REST_URL=
-NEXT_PUBLIC_UPSTASH_REDIS_REST_TOKEN=
-QSTASH_REST_TOKEN=
-APP_URL=<YOUR_DEPLOYMENT_URL>
-```
+![Vercel Credentials](/public/vercel-credentials.png)
+
+Alternatively, you can fork this repository and deploy it to any other platform of choice.
+
+To gather the credentials, please follow:
+
+1. **Redis Secrets**
+   Navigate to [Upstash Console](console.upstash.com), and create a database. Then, copy the `UPSTASH_REDIS_NEXT_URL` and `UPSTASH_REDIS_NEXT_TOKEN` variables to necessary fields in `.env.local` file.
+
+   ![Redis Credentials](/public/redis-credentials.png)
+
+2. **QStash Secrets**
+   Again in the [Upstash Console](console.upstash.com), navigate to QStash section. And copy the necessary fields.
+
+   ![QStash Credentials](/public/qstash-credentials.png)
+
+3. **App URL**
+   Finally, please fill in the URL of choice for your project. After the defining this credential, please configure your project to this domain, or vice versa.
+
+If you have any questions related to the process, please visit [Upstash Documentation](upstash.com/docs), or get in touch via [mail](mailto:support@upstash.com)
 
 ### Learn More
 
